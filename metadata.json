@@ -1,0 +1,6 @@
+{
+  "name": "CareSync Clinical & ServiceNow IT Operations",
+  "description": "Hospital clinical operations and ServiceNow IT service requests & incident tracking dashboard for ICUs, medication safety, bed management, care tasks, and clinical analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

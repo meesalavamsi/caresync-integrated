@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+ 
+/* Continuous bedside-monitor ECG sweep. The waveform SVG is drawn twice,
+   back-to-back, at 200% of its container's width; shifting it left by
+   exactly 50% of that width scrolls exactly one full pattern length, so it
+   loops with no visible seam. Speed is set per-card via inline
+   animation-duration (faster heart rate → faster sweep). */
+@keyframes ecg-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ecg-track {
+  animation-name: ecg-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* ── Bed status animations (Bed Management view) ─────────────────────────── */
+/* Tuned to be unmistakable at a glance — fast, saturated, and combined with
+   a scale "pulse" on the whole card, not just a faint shadow. */
+
+/* Badge pulse, reused on the status pill for all three animated statuses. */
+@keyframes bed-badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.14); }
+}
+.bed-badge-pulse {
+  animation: bed-badge-pulse 1s ease-in-out infinite;
+}
+
+/* Expanding colored "shockwave" ring — clipped by the card's own
+   overflow-hidden, so it reads as a bright pulsing halo around the edges. */
+@keyframes bed-shockwave {
+  0%   { transform: scale(1);   opacity: 0.95; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.bed-shockwave {
+  position: absolute;
+  inset: 0;
+  border-width: 3px;
+  border-style: solid;
+  pointer-events: none;
+  animation: bed-shockwave 1.3s ease-out infinite;
+}
+.bed-shockwave-amber   { border-color: #f59e0b; }
+.bed-shockwave-teal    { border-color: #0d9488; }
+.bed-shockwave-emerald { border-color: #059669; }
+
+/* CLEANING — spinning sparkle, a fast amber shimmer sweep, a moving
+   diagonal "in-progress" stripe bar along the top edge (reads like an
+   active progress bar), and a pulsing scale + glow on the whole card. */
+@keyframes bed-cleaning-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.bed-cleaning-icon {
+  animation: bed-cleaning-spin 1.3s linear infinite;
+  transform-origin: 32px 22px; /* center of the sparkle glyph in the 64x64 viewBox */
+}
+@keyframes bed-cleaning-sweep {
+  0%   { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
+}
+.bed-cleaning-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 25%, rgba(217, 119, 6, 0.4) 50%, transparent 75%);
+  animation: bed-cleaning-sweep 1s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes bed-cleaning-stripes {
+  from { background-position: 0 0; }
+  to   { background-position: 42px 0; }
+}
+.bed-cleaning-stripe-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #f59e0b 0, #f59e0b 9px,
+    #fde68a 9px, #fde68a 18px
+  );
+  background-size: 42px 100%;
+  animation: bed-cleaning-stripes 0.65s linear infinite;
+}
+@keyframes bed-cleaning-card-pulse {
+  0%, 100% { transform: scale(1);     box-shadow: 0 0 14px 2px rgba(217, 119, 6, 0.35); border-color: rgb(252 191 36); }
+  50%      { transform: scale(1.025); box-shadow: 0 0 26px 6px rgba(217, 119, 6, 0.55); border-color: rgb(180 83 9); }
+}
+.bed-cleaning-card {
+  animation: bed-cleaning-card-pulse 1.1s ease-in-out infinite;
+}
+
+/* OCCUPIED — a two-beat "heartbeat" scale on the card, a breathing person
+   glyph, and a teal glow, reading as a live, actively monitored patient. */
+@keyframes bed-occupied-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+.bed-occupied-icon {
+  animation: bed-occupied-breathe 1.7s ease-in-out infinite;
+  transform-origin: 32px 34px;
+}
+@keyframes bed-occupied-heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%      { transform: scale(1.035); }
+  20%      { transform: scale(1); }
+  30%      { transform: scale(1.02); }
+  40%      { transform: scale(1); }
+}
+@keyframes bed-occupied-card-glow {
+  0%, 100% { box-shadow: 0 0 10px 1px rgba(15, 118, 110, 0.3); }
+  50%      { box-shadow: 0 0 22px 4px rgba(15, 118, 110, 0.5); }
+}
+.bed-occupied-card {
+  animation: bed-occupied-heartbeat 2.4s ease-in-out infinite, bed-occupied-card-glow 2.4s ease-in-out infinite;
+}
+
+/* AVAILABLE — checkmark pop, a breathing scale, and an emerald "ready"
+   glow, so an empty sanitized bed reads as inviting, not idle. */
+@keyframes bed-available-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.bed-available-icon {
+  animation: bed-available-pop 0.5s ease-out;
+  transform-origin: 32px 22px;
+}
+@keyframes bed-available-card-glow {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 10px 1px rgba(5, 150, 105, 0.3); }
+  50%      { transform: scale(1.02); box-shadow: 0 0 22px 4px rgba(5, 150, 105, 0.5); }
+}
+.bed-available-card {
+  animation: bed-available-card-glow 1.9s ease-in-out infinite;
+}
