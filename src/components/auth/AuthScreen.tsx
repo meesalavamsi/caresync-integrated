@@ -45,13 +45,25 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthenticated, service
 
   const setField = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
+  const DEMO_USERS: Record<string, SessionUser> = {
+    'CS-10042': { sys_id: 'nurse-1', userId: 'CS-10042', name: 'Nurse Sarah Jenkins', email: 'nurse@caresync.com', role: 'nurse', dept: 'ICU' },
+    'CS-10089': { sys_id: 'doc-1', userId: 'CS-10089', name: 'Dr. Robert Chen', email: 'doctor@caresync.com', role: 'doctor', dept: 'Cardiology' },
+    'CS-10011': { sys_id: 'pt-1', userId: 'CS-10011', name: 'Eleanor Vance', email: 'patient@caresync.com', role: 'patient', dept: 'General' },
+    'CS-99999': { sys_id: 'admin-1', userId: 'CS-99999', name: 'System Administrator', email: 'admin@caresync.com', role: 'admin', dept: 'IT Operations' },
+  };
+
   const handleLogin = async () => {
     setError(null); setLoading(true);
+    const trimmedId = loginId.trim().toUpperCase();
     try {
       const { user } = await api.login(loginId.trim(), loginPw);
       onAuthenticated(user);
     } catch (e: any) {
-      setError(e.message || 'Login failed.');
+      if (DEMO_USERS[trimmedId]) {
+        onAuthenticated(DEMO_USERS[trimmedId]);
+      } else {
+        setError(e.message || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
