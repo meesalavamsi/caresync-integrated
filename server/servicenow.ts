@@ -31,21 +31,30 @@ class ServiceNowClient {
 
   /** Lightweight reachability probe used by /api/health. */
   async ping(): Promise<{ ok: boolean; message: string }> {
-    if (!this.configured) {
-      return { ok: false, message: 'ServiceNow credentials not configured in .env' };
-    }
     try {
-      // sysparm_limit=1 keeps this cheap; any 2xx means auth + reachability are good.
-      await this.client.get('/now/table/sys_user', { params: { sysparm_limit: 1 } });
-      return { ok: true, message: 'ServiceNow reachable and authenticated' };
+      await axios.get('https://dev183600.service-now.com/api/x_1850353_caresy_0/caresync/dashboard', { timeout: 10000 });
+      return { ok: true, message: 'ServiceNow Scripted REST API Connected & Operational' };
     } catch (err: any) {
-      const status = err?.response?.status;
-      return {
-        ok: false,
-        message: status
-          ? `ServiceNow returned HTTP ${status}`
-          : `ServiceNow unreachable: ${err?.message || 'network error'}`,
-      };
+      if (this.configured) {
+        try {
+          await this.client.get('/now/table/sys_user', { params: { sysparm_limit: 1 } });
+          return { ok: true, message: 'ServiceNow reachable and authenticated' };
+        } catch (e: any) {
+          const status = e?.response?.status;
+          return { ok: false, message: status ? `ServiceNow returned HTTP ${status}` : `ServiceNow unreachable: ${e?.message}` };
+        }
+      }
+      return { ok: false, message: 'ServiceNow unreachable: ' + (err?.message || 'network error') };
+    }
+  }
+
+  async getDashboardData() {
+    try {
+      const res = await axios.get('https://dev183600.service-now.com/api/x_1850353_caresy_0/caresync/dashboard', { timeout: 10000 });
+      return res.data.result;
+    } catch (err: any) {
+      const res = await this.client.get('/x_1850353_caresy_0/caresync/dashboard');
+      return res.data.result;
     }
   }
 

@@ -76,6 +76,16 @@ export function registerRoutes(app: Express) {
     });
   });
 
+  // ── SCRIPTED REST API DASHBOARD ─────────────────────────────────────────
+  app.get('/api/dashboard', async (_req: Request, res: Response) => {
+    try {
+      const data = await snClient.getDashboardData();
+      res.json({ success: true, result: data });
+    } catch (err: any) {
+      res.status(500).json({ success: false, message: 'Failed to fetch dashboard from ServiceNow', error: err?.message });
+    }
+  });
+
   // ── AUTH ──────────────────────────────────────────────────────────────────
   app.post('/api/auth/send-otp', async (req: Request, res: Response) => {
     const { email } = req.body;

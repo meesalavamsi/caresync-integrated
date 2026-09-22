@@ -54,6 +54,8 @@ export const api = {
       body: JSON.stringify({ userId, password }),
     }),
 
+  getDashboard: () => request<{ success: boolean; result: any }>('/api/dashboard'),
+
   // Patients
   getPatients: () => request<{ success: boolean; patients: any[] }>('/api/patients'),
   updatePatient: (sysId: string, body: Record<string, any>) =>
