@@ -15,9 +15,9 @@ class ServiceNowClient {
   configured: boolean;
 
   constructor() {
-    this.instanceUrl = (process.env.SERVICENOW_INSTANCE || '').replace(/\/$/, '');
-    this.username = process.env.SERVICENOW_USERNAME || '';
-    this.password = process.env.SERVICENOW_PASSWORD || '';
+    this.instanceUrl = (process.env.SERVICENOW_INSTANCE || '').trim().replace(/\/$/, '');
+    this.username = (process.env.SERVICENOW_USERNAME || '').trim();
+    this.password = (process.env.SERVICENOW_PASSWORD || '').trim();
     // Only treat the client as usable if all three are present.
     this.configured = Boolean(this.instanceUrl && this.username && this.password);
 
