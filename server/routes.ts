@@ -1,9 +1,9 @@
 import type { Express, Request, Response } from 'express';
-import snClient from './servicenow';
-import { sendEmail, emailConfigured } from './email';
-import { evaluateHandoff, predictBed, familyVoiceReply, aiConfigured } from './ai';
-import approvalManager from './approvals';
-import { resolveDeptEmail } from './departments';
+import snClient from './servicenow.js';
+import { sendEmail, emailConfigured } from './email.js';
+import { evaluateHandoff, predictBed, familyVoiceReply, aiConfigured } from './ai.js';
+import approvalManager from './approvals.js';
+import { resolveDeptEmail } from './departments.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 
