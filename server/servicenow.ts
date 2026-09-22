@@ -49,37 +49,94 @@ class ServiceNowClient {
     }
   }
 
+  private getCandidateTables(table: string): string[] {
+    const TABLE_ALIASES: Record<string, string[]> = {
+      'x_snc_caresync_1_patient': ['x_1850353_caresy_0_patient', 'x_snc_caresync_1_patient'],
+      'x_snc_caresync_1_clinical_task': ['x_1850353_caresy_0_clin_task', 'x_snc_caresync_1_clinical_task'],
+      'x_snc_caresync_1_bed_management': ['x_1850353_caresy_0_bed_mgmt', 'x_snc_caresync_1_bed_management'],
+      'x_snc_caresync_1_medication_administration_record': ['x_1850353_caresy_0_med_admin', 'x_snc_caresync_1_med_admin', 'x_snc_caresync_1_medication_administration_record'],
+      'x_snc_caresync_1_care_plan': ['x_1850353_caresy_0_care_plan', 'x_snc_caresync_1_care_plan'],
+    };
+    return TABLE_ALIASES[table] || [table];
+  }
+
   async getTableRecords(table: string, query = '', displayValue: boolean | 'all' = true, limit = 200) {
-    const response = await this.client.get(`/now/table/${table}`, {
-      params: {
-        sysparm_query: query,
-        sysparm_limit: limit,
-        sysparm_display_value: displayValue,
-      },
-    });
-    return response.data.result as any[];
+    const candidates = this.getCandidateTables(table);
+    let lastError: any = null;
+    for (const t of candidates) {
+      try {
+        const response = await this.client.get(`/now/table/${t}`, {
+          params: { sysparm_query: query, sysparm_limit: limit, sysparm_display_value: displayValue },
+        });
+        return response.data.result as any[];
+      } catch (err: any) {
+        lastError = err;
+        if (err?.response?.status !== 404) throw err;
+      }
+    }
+    throw lastError;
   }
 
   async getRecord(table: string, sysId: string, displayValue = true) {
-    const response = await this.client.get(`/now/table/${table}/${sysId}`, {
-      params: { sysparm_display_value: displayValue },
-    });
-    return response.data.result as any;
+    const candidates = this.getCandidateTables(table);
+    let lastError: any = null;
+    for (const t of candidates) {
+      try {
+        const response = await this.client.get(`/now/table/${t}/${sysId}`, {
+          params: { sysparm_display_value: displayValue },
+        });
+        return response.data.result as any;
+      } catch (err: any) {
+        lastError = err;
+        if (err?.response?.status !== 404) throw err;
+      }
+    }
+    throw lastError;
   }
 
   async createRecord(table: string, data: Record<string, any>) {
-    const response = await this.client.post(`/now/table/${table}`, data);
-    return response.data.result as any;
+    const candidates = this.getCandidateTables(table);
+    let lastError: any = null;
+    for (const t of candidates) {
+      try {
+        const response = await this.client.post(`/now/table/${t}`, data);
+        return response.data.result as any;
+      } catch (err: any) {
+        lastError = err;
+        if (err?.response?.status !== 404) throw err;
+      }
+    }
+    throw lastError;
   }
 
   async updateRecord(table: string, sysId: string, data: Record<string, any>) {
-    const response = await this.client.put(`/now/table/${table}/${sysId}`, data);
-    return response.data.result as any;
+    const candidates = this.getCandidateTables(table);
+    let lastError: any = null;
+    for (const t of candidates) {
+      try {
+        const response = await this.client.put(`/now/table/${t}/${sysId}`, data);
+        return response.data.result as any;
+      } catch (err: any) {
+        lastError = err;
+        if (err?.response?.status !== 404) throw err;
+      }
+    }
+    throw lastError;
   }
 
   async deleteRecord(table: string, sysId: string) {
-    await this.client.delete(`/now/table/${table}/${sysId}`);
-    return { success: true };
+    const candidates = this.getCandidateTables(table);
+    let lastError: any = null;
+    for (const t of candidates) {
+      try {
+        await this.client.delete(`/now/table/${t}/${sysId}`);
+        return { success: true };
+      } catch (err: any) {
+        lastError = err;
+        if (err?.response?.status !== 404) throw err;
+      }
+    }
+    throw lastError;
   }
 
   // ── User helpers (used by auth) ───────────────────────────────────────────
